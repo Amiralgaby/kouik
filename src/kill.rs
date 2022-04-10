@@ -1,5 +1,5 @@
-use nix::unistd::Pid;
-use nix::sys::signal::{kill,Signal};
+use libc::{kill,EINVAL,EPERM,ESRCH};
+use libc;
 use crate::lib::Proc;
 
 pub fn kill_proc_by_name(progname: &str, liste_procs: &Vec<Proc>) -> Result<u32,String> {
@@ -31,9 +31,26 @@ pub fn kill_proc_by_name(progname: &str, liste_procs: &Vec<Proc>) -> Result<u32,
 }
 
 pub fn kill_proc(processus: &Proc) -> Option<String> {
-    let result_of_kill : nix::Result<()> = kill(Pid::from_raw(processus.pid),Signal::SIGTERM);
-    if let Err(error) = result_of_kill {
-        return Some(error.to_string());
+    let result_of_kill : i32  = unsafe { kill(processus.pid,libc::SIGTERM) };
+    
+    if result_of_kill == 0 {
+        return None;
     }
-    None
+
+    let errno = unsafe {
+        libc::__errno_location() as i32
+    };
+
+    let mystr = match errno {
+        EINVAL => "An invalid signal was specified.",
+        EPERM => "The calling process does not have permission to send the
+              signal to any of the target processes.",
+        ESRCH => "The target process or process group does not exist.  Note
+              that an existing process might be a zombie, a process that
+              has terminated execution, but has not yet been waited for.",
+        _ => "Unimplemented error",
+    };
+
+    return Some(mystr.to_string());
 }
+

@@ -1,20 +1,21 @@
-use clap::{App, Arg};
+use clap::{Command, arg};
 use std::io::{stdin,stdout,Write};
 
 pub mod lib;
 pub mod kill;
 
-const VERSION: &'static str = "0.2.4";
-const APP_NAME: &'static str = "Kouik";
+// const VERSION: &'static str = "";
+// const APP_NAME: &'static str = "Kouik";
 
-fn build_cli() -> App<'static, 'static> {
-    App::new(APP_NAME)
-    .bin_name("kouik")
-    .version(VERSION)
+fn build_cli() -> Command<'static> {
+    Command::new(env!("CARGO_PKG_NAME"))
+    .bin_name(env!("CARGO_PKG_NAME"))
+    .version(env!("CARGO_PKG_VERSION"))
     .author("Ferry Jérémie ferryjeremie@free.fr")
     .author("Gabriel Theuws gaby.theuws@gmail.com")
     .about("kill program")
-    .arg(Arg::with_name("program").required(true).index(1).help("le nom du programme à tuer"))    
+    .arg(arg!([program] "nom du programme à tuer"))
+    .arg_required_else_help(true)
 }
 
 fn main() {
@@ -103,7 +104,8 @@ fn interact_with_user_ask_if_it_must_kill(progname: &str, processus_similar: &Ve
          * Est-ce qu'il doit se reformuler ou alors il choisi dans la liste ???
          */
         _ => {
-            println!("Auriez-vous voulu dire \"{}\" ?", progname);
+
+            println!("Plusieurs correspondances trouvées {:?} ou {:?} ?", processus_similar.get(0).unwrap().names, processus_similar.get(1).unwrap().names);
             return None; // a implémenter
         }
     }

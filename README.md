@@ -39,3 +39,15 @@ replace by
 ```sh
 kouik browser
 ```
+
+## Contributing
+### english
+All contributions are welcome, for me it's important that you had fun to contribute :)
+
+The pull requests I dream to see, are the ones that allow me to improve my knowledge of Rust and its environnement ^^
+
+### français
+Toutes les contributions sont les bienvenues, pour moi il est important que vous ayez pris du plaisir à contribuer :)
+
+Les pull request que je rêve de voir, sont celles qui me permettent d'améliorer mes connaissances en Rust et sa communauté ^^
+
