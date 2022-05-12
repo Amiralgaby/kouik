@@ -3,50 +3,40 @@ use levenshtein::levenshtein;
 use std::fs;
 use std::path::Path;
 use std::io::Error;
+use std::fs::File;
+use std::io::Read;
 
 pub struct Proc {
 	pub pid: i32,
-	pub names: Vec<String>,
+	pub name: String,
 }
 
 pub fn get_procs() -> Result<Vec<Proc>,Error> {
 
 	let mut processus = Vec::<Proc>::new();
-
+    
 	for entry in fs::read_dir(Path::new("/proc"))? {
 
 		let entry = entry?;
-		let path = entry.path().join("exe");
+		let path = entry.path().join("stat");
+		
+        // println!("le path est : {}", path.as_path().to_str().unwrap());
+        
+		if path.exists() && !path.is_dir() {
+            
+            let mut contents = String::new();
+            
+            File::open(path)?.read_to_string(&mut contents)?;
+            
+            let start_paren = contents.find('(').unwrap();
+            let end_paren = contents.rfind(')').unwrap();
+            let pid_s = &contents[..start_paren - 1];
+            let name = contents[start_paren + 1..end_paren].to_string();
 
-		if let Ok(filename) = get_basename_symlink(&path) {
-
-			if let Some(pathtmp) = entry.path().as_path().to_str() {
-
-				if let Some(index) = pathtmp.to_string().rfind('/') {
-
-					let pid: Result<i32,_> = pathtmp[index+1..].parse();
-					
-					if let Ok(pid_ok) = pid {
-                        let vec_s = vec![filename];
-                        let process = Proc {pid: pid_ok, names: vec_s};
-                        processus.push(process);
-					}
-				}
-			}
-		}
+            processus.push(Proc { pid: pid_s.parse().unwrap(), name});
+        }
 	}
 	Ok(processus)
-}
-
-pub fn get_basename_symlink(entry: &Path) -> Result<String,&'static str> {
-	if let Ok(path) = fs::read_link(entry) {
-		if let Some(filename) = path.file_name() {
-			if let Some(file) = filename.to_str() {
-				return Ok(file.to_string());
-			}
-		}
-	}
-	Err("impossible d'obtenir le nom du lien symbolique : permission non accordée")
 }
 
 pub struct LevensteinProc {
@@ -57,17 +47,15 @@ pub struct LevensteinProc {
 pub fn obtain_levensthein_distance(progname: &str, liste_procs: Vec<Proc>) -> Vec<LevensteinProc> {
 	
 	let mut leven_vec_of_proc = Vec::<LevensteinProc>::new();
-
+    
 	for processus in liste_procs {
 
 		let mut min: usize = 999;
-
-		for name in &processus.names {
-			let dist = levenshtein(name,progname);
-			if dist < min {
-				min = dist;
-			}
-		}
+        
+        let dist = levenshtein(&processus.name,progname);
+        if dist < min {
+            min = dist;
+        }
 
 		leven_vec_of_proc.push(LevensteinProc{proc: processus, levensthein_distance: min});
 	}

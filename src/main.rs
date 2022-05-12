@@ -30,19 +30,19 @@ fn main() {
             Ok(liste_procs) => {
                 /* find exact programme */
                 let res_nb_killed_or_trace : Result<u32,String> = kill::kill_proc_by_name(program_name,&liste_procs);
-
+                
                 if let Err(error_trace) = res_nb_killed_or_trace {
                     eprintln!("{}",error_trace);
                     return;
                 }
-
+                
                 let nb_killed = res_nb_killed_or_trace.unwrap();
 
                 if nb_killed == 0 {
-                    
+                
                     // calcul leveinstein distance pour tous
                     let proc_with_levensthein_distance = lib::obtain_levensthein_distance(program_name,liste_procs);
-
+                    
                     let value_max_to_be_close : usize = program_name.chars().count()/2 - 1;
 
                     /* Si la valeur est en dessous ou égale à zero ça signifirai que
@@ -73,8 +73,8 @@ fn main() {
                     }
                 }
             },
-            Err(_) => {
-                eprintln!("flûte une erreur s'est produite !");
+            Err(e) => {
+                eprintln!("flûte une erreur s'est produite ! : {:?}", e);
             },
         }
     }
@@ -86,7 +86,7 @@ fn interact_with_user_ask_if_it_must_kill(progname: &str, processus_similar: &[l
         /* if there are one programme say Yes or No */
         1 => {
             println!("Un processus au nom similaire à été trouvé pour \"{}\"", progname);
-            print!("Voulez vous tuer le processus {:?} ? (o/N)\t", processus_similar.get(0).unwrap().names);
+            print!("Voulez vous tuer le processus {:?} ? (o/N)\t", processus_similar.get(0).unwrap().name);
             stdout().flush().expect("Le flush de stdout à échoué");
             let mut s = String::new();
             stdin().read_line(&mut s).expect("Did not enter a correct string");
@@ -104,8 +104,7 @@ fn interact_with_user_ask_if_it_must_kill(progname: &str, processus_similar: &[l
          * Est-ce qu'il doit se reformuler ou alors il choisi dans la liste ???
          */
         _ => {
-
-            println!("Plusieurs correspondances trouvées {:?} ou {:?} ?", processus_similar.get(0).unwrap().names, processus_similar.get(1).unwrap().names);
+            println!("Plusieurs correspondances trouvées {:?} ou {:?} ?", processus_similar.get(0).unwrap().name, processus_similar.get(1).unwrap().name);
             None // a implémenter
         }
     }

@@ -8,18 +8,16 @@ pub fn kill_proc_by_name(progname: &str, liste_procs: &Vec<Proc>) -> Result<u32,
     let mut error_desc_trace : String = String::new();
 	
     for process in liste_procs {
-		for procname in &process.names {
-			if procname == progname {
-				match kill_proc(process) {
-                    None => compteur += 1,
-                    Some(error_description) => {
-                        error_desc_trace.push_str("process : ");
-                        error_desc_trace.push_str(&process.pid.to_string());
-                        error_desc_trace.push(' ');
-                        error_desc_trace.push_str(&error_description);
-                        error_desc_trace.push('\n');
-                    },
-                }
+        if process.name == *progname {
+			match kill_proc(process) {
+                None => compteur += 1,
+                Some(error_description) => {
+                    error_desc_trace.push_str("process : ");
+                    error_desc_trace.push_str(&process.pid.to_string());
+                    error_desc_trace.push(' ');
+                    error_desc_trace.push_str(&error_description);
+                    error_desc_trace.push('\n');
+                },
             }
         }
     }
