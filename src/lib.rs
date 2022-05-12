@@ -25,14 +25,11 @@ pub fn get_procs() -> Result<Vec<Proc>,Error> {
 				if let Some(index) = pathtmp.to_string().rfind('/') {
 
 					let pid: Result<i32,_> = pathtmp[index+1..].parse();
-
-					match pid {
-						Ok(pid_ok) => {
-							let vec_s = vec![filename];
-							let process = Proc {pid: pid_ok, names: vec_s};
-							processus.push(process);
-						},
-						Err(_) => {},
+					
+					if let Ok(pid_ok) = pid {
+                        let vec_s = vec![filename];
+                        let process = Proc {pid: pid_ok, names: vec_s};
+                        processus.push(process);
 					}
 				}
 			}

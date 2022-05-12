@@ -49,7 +49,7 @@ fn main() {
                      * le nom est considéré proche s'il correspond parfaitement (distance levensthein == 0)
                      * et si nous sommes là c'est qu'il n'y en avait aucun qui correspondait parfaitement
                      */
-                    if value_max_to_be_close <= 0 {
+                    if value_max_to_be_close == 0 {
                         println!("Aucun processus ne correspond au nom {:?}", program_name);
                         return;
                     }
@@ -80,7 +80,7 @@ fn main() {
     }
 }
 
-fn interact_with_user_ask_if_it_must_kill(progname: &str, processus_similar: &Vec<lib::Proc>) -> Option<usize> {
+fn interact_with_user_ask_if_it_must_kill(progname: &str, processus_similar: &[lib::Proc]) -> Option<usize> {
 
     match processus_similar.len() {
         /* if there are one programme say Yes or No */
@@ -93,12 +93,12 @@ fn interact_with_user_ask_if_it_must_kill(progname: &str, processus_similar: &Ve
             if s == "O\n" || s == "o\n" {
                 return Some(0);
             }
-            return None;
+            None
         }
         /* if no programme find, then send error message */
         0 => {
             println!("Aucun processus trouvé pour le nom \"{}\"", progname);
-            return None;
+            None
         }
         /* if there are several programme, ask for user correction or choose ??? 
          * Est-ce qu'il doit se reformuler ou alors il choisi dans la liste ???
@@ -106,7 +106,7 @@ fn interact_with_user_ask_if_it_must_kill(progname: &str, processus_similar: &Ve
         _ => {
 
             println!("Plusieurs correspondances trouvées {:?} ou {:?} ?", processus_similar.get(0).unwrap().names, processus_similar.get(1).unwrap().names);
-            return None; // a implémenter
+            None // a implémenter
         }
     }
 }

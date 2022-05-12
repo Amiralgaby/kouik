@@ -10,7 +10,7 @@ pub fn kill_proc_by_name(progname: &str, liste_procs: &Vec<Proc>) -> Result<u32,
     for process in liste_procs {
 		for procname in &process.names {
 			if procname == progname {
-				match kill_proc(&process) {
+				match kill_proc(process) {
                     None => compteur += 1,
                     Some(error_description) => {
                         error_desc_trace.push_str("process : ");
@@ -24,7 +24,7 @@ pub fn kill_proc_by_name(progname: &str, liste_procs: &Vec<Proc>) -> Result<u32,
         }
     }
 
-    if error_desc_trace.is_empty() == false {
+    if !error_desc_trace.is_empty() {
         return Err(error_desc_trace);
     }
     Ok(compteur)
@@ -51,6 +51,6 @@ pub fn kill_proc(processus: &Proc) -> Option<String> {
         _ => "Unimplemented error",
     };
 
-    return Some(mystr.to_string());
+    Some(mystr.to_string())
 }
 
